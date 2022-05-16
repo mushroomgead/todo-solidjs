@@ -1,52 +1,61 @@
-import { Component, createSignal, Show, JSX } from 'solid-js';
+import { Component, createSignal, Show } from 'solid-js';
+import { Button, TextInput } from './base';
 
-export interface ToDoItemProps {
+const ToDoItem: Component<{
   key: number;
   title: string;
   handleOnRemoveItem: (key: number) => void;
   handleOnEditItem: (key: number, newValue: string) => void;
-}
-
-const ToDoItem: Component<ToDoItemProps> = ({
-  key,
-  title,
-  handleOnRemoveItem,
-  handleOnEditItem,
-}) => {
+}> = ({ key, title, handleOnRemoveItem, handleOnEditItem }) => {
   const [mode, setMode] = createSignal('view');
   const [text, setText] = createSignal('');
 
-  const handleOnChangeText: JSX.EventHandler<HTMLInputElement, InputEvent> = (
-    event
-  ) => {
+  const handleOnChangeText = (event) => {
     setText(event.currentTarget.value);
   };
 
   return (
-    <div>
+    <div class='flex justify-between my-2 items-center py-2'>
       <Show when={mode() === 'view'}>
         <h1>{title}</h1>
-        <button onClick={() => handleOnRemoveItem(key)}>x</button>
-        <button
-          onClick={() => {
-            setMode('edit');
-            setText(title);
-          }}
-        >
-          edit
-        </button>
+        <div class='flex'>
+          <button
+            class='mr-4'
+            onClick={() => {
+              setMode('edit');
+              setText(title);
+            }}
+          >
+            <img src='/src/assets/icons/edit.svg'></img>
+          </button>
+          <button class='' onClick={() => handleOnRemoveItem(key)}>
+            <img src='/src/assets/icons/trash.svg'></img>
+          </button>
+        </div>
       </Show>
       <Show when={mode() === 'edit'}>
-        <input type='text' value={text()} onChange={handleOnChangeText} />
-        <button
-          onClick={() => {
-            setMode('view');
-            handleOnEditItem(key, text());
-          }}
-        >
-          ok
-        </button>
-        <button onClick={() => setMode('view')}>cancel</button>
+        <TextInput
+          value={text}
+          onChange={handleOnChangeText}
+          style='mr-5 h-full rounded-md'
+        />
+        <div class='flex'>
+          <Button
+            title='ok'
+            color='bg-green-600'
+            style='relative mr-4 top-0'
+            onClick={() => {
+              setMode('view');
+              handleOnEditItem(key, text());
+            }}
+          />
+          <Button
+            title='cancel'
+            color='bg-rose-600 top-0'
+            style='relative'
+            onClick={() => setMode('view')}
+          />
+        </div>
       </Show>
     </div>
   );
